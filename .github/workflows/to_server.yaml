@@ -1,0 +1,31 @@
+name: Deploy to server
+
+on: push
+
+jobs:
+  upload:
+    name: Upload to FTP
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Install dependencies
+      uses: php-actions/composer@v6
+
+    - name: Crate credentials.json file
+      run: |
+        echo ${{ secrets.CREDENTIALS }} > credentials.json
+
+    - run: git status
+    - run: git reset --hard
+    - name: FTP Upload Process
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: ${{ secrets.FTP_DIR }}
+
+
