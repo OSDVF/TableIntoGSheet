@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
-
 use \Google\Service\Sheets;
 
 function get_safe_table($mysqli, $table)
@@ -140,49 +138,3 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
     return $update_sheet;
 }
 
-if (realpath(__FILE__) == realpath($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_FILENAME']))
-{
-    // The script was run directly
-    $shortopts = "i:h:d:u:p:t:s:m:a";
-
-    $longopts  = array(
-        "sheetId:",
-        "hostname:",
-        "db:",
-        "user:",
-        "password:",
-        "table:",
-        "page:",
-        "max:",
-        "append"
-    );
-    $restIndex;
-    $options = getopt($shortopts, $longopts, $restIndex);
-    if (!$options)
-    {
-        echo 'Parameters error';
-        die;
-    }
-
-    if ((@$options['a'] ?? @$options['append']) === false)
-    {
-        var_dump(appendToSheet(
-            @$_GET['sheet'] ?? @$options['i'] ?? $options['sheetId'],
-            @getenv('page') ?? @$options['s'] ?? $options['page'],
-            array_slice($argv, $restIndex),
-            @$options['m'] ?? $options['max'] ?? 10000
-        ));
-    }
-    else
-    {
-        var_dump(copyDbToSheet(
-            @$_GET['sheet'] ?? @$options['i'] ?? $options['sheetId'],
-            $options['h'] ?? @$options['hostname'] ?? @getenv('hostname'),
-            @$options['d'] ?? @$options['db'] ?? @getenv('db'),
-            @$options['u'] ?? @$options['user'] ?? @getenv('user'),
-            @$options['p'] ?? @$options['password'] ?? @getenv('password'),
-            @$options['table'] ?? @$options['t'] ?? @getenv('table'),
-            @$options['s'] ?? $options['page'] ?? @getenv('page')
-        ));
-    }
-}

@@ -1,17 +1,6 @@
 # TableIntoGSheet
 
-This script can be called directly from command line.
-For parameters, see documentation comments at lines 39 and 74 ;)
-
-```
-php copy.php -iMyID -hlocalhost -dmydatabase -uroot -tMyTable -sMySheetPage
-```
-
-Can also append data to a new row
-
-```
-php copy.php -iMyID -a firstColValue secondColValue
-```
+This branch contains a version that can be used as a composer package. So no command line usage is possible.
 
 # Usage
 

@@ -1,5 +1,18 @@
 {
+    "name": "OSDVF/TableIntoGSheet",
+    "description": "TableIntoGSheet - mirror your SQL table into Google Sheets",
+    "type": "library",
+    "homepage": "https://github.com/OSDVF/TableIntoGSheet",
+    "authors": [
+        {
+            "name": "OSDVF",
+            "email": "o.s.dv.f@seznam.cz"
+        }
+    ],
     "require": {
         "google/apiclient": "2.12.1"
+    },
+    "autoload": {
+        "files": ["copy.php"]
     }
 }
