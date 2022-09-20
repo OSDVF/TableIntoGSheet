@@ -1,5 +1,5 @@
 {
-    "name": "OSDVF/TableIntoGSheet",
+    "name": "osdvf/tableintogsheet",
     "description": "TableIntoGSheet - mirror your SQL table into Google Sheets",
     "type": "library",
     "homepage": "https://github.com/OSDVF/TableIntoGSheet",
