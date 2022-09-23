@@ -1,4 +1,5 @@
 <?php
+
 use \Google\Service\Sheets;
 
 function get_safe_table($mysqli, $table)
@@ -44,15 +45,16 @@ function getNameFromNumber($num)
  * @param string $pageName Name of page in google sheet
  * @param array<array<string>> $values Array of rows. Each value in inner array is one column in a row
  * @param int $maxRows Maximum row count of the table. If unsure, set to 10000000.
+ * @param string|object|null $credentials Credentials file path, decoded associative json object, or null for ./credentials.json
  */
-function appendToSheet($spreadsheetId, $pageName, $values, $maxRows)
+function appendToSheet($spreadsheetId, $pageName, $values, $maxRows, $credentials)
 {
     //Reading data from spreadsheet.
     $client = new \Google_Client();
     $client->setApplicationName('TableIntoGSheet');
     $client->setScopes([Sheets::SPREADSHEETS]);
     $client->setAccessType('offline');
-    $client->setAuthConfig(__DIR__ . '/credentials.json');
+    $client->setAuthConfig($credentials ?? 'credentials.json');
 
     $service = new Sheets($client);
     $colLetter = getNameFromNumber(count($values));
@@ -79,8 +81,9 @@ function appendToSheet($spreadsheetId, $pageName, $values, $maxRows)
  * @param string $dbPassword
  * @param string $table The SQL table to mirror
  * @param string $pageName Name of page in google sheet
+ * @param string|object|null $credentials Credentials file path, decoded associative json object, or null for ./credentials.json
  */
-function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword, $table, $pageName)
+function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword, $table, $pageName, $credentials)
 {
 
     //Reading data from spreadsheet.
@@ -88,7 +91,7 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
     $client->setApplicationName('TableIntoGSheet');
     $client->setScopes([Sheets::SPREADSHEETS]);
     $client->setAccessType('offline');
-    $client->setAuthConfig(__DIR__ . '/credentials.json');
+    $client->setAuthConfig($credentials ?? 'credentials.json');
 
     $service = new Sheets($client);
 
@@ -137,4 +140,3 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
     $update_sheet = $service->spreadsheets_values->update($spreadsheetId, $update_range, $body, $params);
     return $update_sheet;
 }
-
