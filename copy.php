@@ -140,3 +140,42 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
     $update_sheet = $service->spreadsheets_values->update($spreadsheetId, $update_range, $body, $params);
     return $update_sheet;
 }
+
+/**
+ * @brief Mirrors the whole database $table into the spreadsheet.
+ * Without column names or any extra steps.
+ * 
+ * @param string $spreadsheetId The long string after https://docs.google.com/spreadsheets/d/
+ * @param string $pageName Name of page in google sheet
+ * @param int $firstRow
+ * @param array $dataArray
+ * @param string|object|null $credentials Credentials file path, decoded associative json object, or null for ./credentials.json
+ */
+function copyArrayToSheet($spreadsheetId, $firstRow, $pageName, $dataArray, $credentials = null)
+{
+    $firstRow ??= 1;
+    //Reading data from spreadsheet.
+    $client = new \Google_Client();
+    $client->setApplicationName('TableIntoGSheet');
+    $client->setScopes([Sheets::SPREADSHEETS]);
+    $client->setAccessType('offline');
+    $client->setAuthConfig($credentials ?? 'credentials.json');
+
+    $service = new Sheets($client);
+
+    $colCount = count($dataArray[0]);//Count of columns in a row
+    $rowCount = count($dataArray) + ($firstRow-1);
+
+    $colLetter = getNameFromNumber($colCount);
+    $update_range = "$pageName!A$firstRow:$colLetter$rowCount";
+
+    $body = new Sheets\ValueRange([
+        'values' => $dataArray
+    ]);
+
+    $params = [
+        'valueInputOption' => 'RAW'
+    ];
+    $update_sheet = $service->spreadsheets_values->update($spreadsheetId, $update_range, $body, $params);
+    return $update_sheet;
+}
