@@ -14,5 +14,13 @@
     },
     "autoload": {
         "files": ["copy.php"]
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Sheets"
+        ]
     }
 }
