@@ -146,8 +146,8 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
  * Without column names or any extra steps.
  * 
  * @param string $spreadsheetId The long string after https://docs.google.com/spreadsheets/d/
- * @param string $pageName Name of page in google sheet
  * @param int $firstRow
+ * @param string $pageName Name of page in google sheet
  * @param array $dataArray
  * @param string|object|null $credentials Credentials file path, decoded associative json object, or null for ./credentials.json
  */
