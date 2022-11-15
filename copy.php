@@ -198,6 +198,9 @@ function hRule($spreadsheetId, $firstRow = 1, $ruleRow = 1, $credentials = null)
                         "color" => [
                             "red" => 1.0
                         ],
+                    ],
+                    "innerHorizontal" => [
+                        "style" => "NONE",
                     ]
                 ],
             ]),
