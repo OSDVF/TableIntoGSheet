@@ -193,7 +193,7 @@ function hRule($spreadsheetId, $firstRow = 1, $ruleRow = 1, $credentials = null)
                         "endRowIndex" => $ruleRow,
                     ],
                     "bottom" => [
-                        "style" => "DASHED",
+                        "style" => "SOLID_MEDIUM",
                         "width" => 4,
                         "color" => [
                             "red" => 1.0
