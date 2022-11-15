@@ -2,6 +2,17 @@
 
 use \Google\Service\Sheets;
 
+function create_service($credentials)
+{
+    $client = new \Google_Client();
+    $client->setApplicationName('TableIntoGSheet');
+    $client->setScopes([Sheets::SPREADSHEETS]);
+    $client->setAccessType('offline');
+    $client->setAuthConfig($credentials ?? 'credentials.json');
+
+    return new Sheets($client);
+}
+
 function get_safe_table($mysqli, $table)
 {
     $query = "SELECT table_name FROM information_schema.TABLES WHERE table_name = ?";
@@ -50,13 +61,8 @@ function getNameFromNumber($num)
 function appendToSheet($spreadsheetId, $pageName, $values, $maxRows, $credentials)
 {
     //Reading data from spreadsheet.
-    $client = new \Google_Client();
-    $client->setApplicationName('TableIntoGSheet');
-    $client->setScopes([Sheets::SPREADSHEETS]);
-    $client->setAccessType('offline');
-    $client->setAuthConfig($credentials ?? 'credentials.json');
 
-    $service = new Sheets($client);
+    $service = create_service($credentials);
     $colLetter = getNameFromNumber(count($values));
     $update_range = "$pageName!A1:$colLetter$maxRows";
 
@@ -87,13 +93,7 @@ function copyDbToSheet($spreadsheetId, $dbHostname, $dbDb, $dbUser, $dbPassword,
 {
 
     //Reading data from spreadsheet.
-    $client = new \Google_Client();
-    $client->setApplicationName('TableIntoGSheet');
-    $client->setScopes([Sheets::SPREADSHEETS]);
-    $client->setAccessType('offline');
-    $client->setAuthConfig($credentials ?? 'credentials.json');
-
-    $service = new Sheets($client);
+    $service = create_service($credentials);
 
     //
     // MySQL setup
@@ -155,16 +155,10 @@ function copyArrayToSheet($spreadsheetId, $firstRow, $pageName, $dataArray, $cre
 {
     $firstRow ??= 1;
     //Reading data from spreadsheet.
-    $client = new \Google_Client();
-    $client->setApplicationName('TableIntoGSheet');
-    $client->setScopes([Sheets::SPREADSHEETS]);
-    $client->setAccessType('offline');
-    $client->setAuthConfig($credentials ?? 'credentials.json');
+    $service = create_service($credentials);
 
-    $service = new Sheets($client);
-
-    $colCount = count($dataArray[0]);//Count of columns in a row
-    $rowCount = count($dataArray) + ($firstRow-1);
+    $colCount = count($dataArray[0]); //Count of columns in a row
+    $rowCount = count($dataArray) + ($firstRow - 1);
 
     $colLetter = getNameFromNumber($colCount);
     $update_range = "$pageName!A$firstRow:$colLetter$rowCount";
@@ -178,4 +172,47 @@ function copyArrayToSheet($spreadsheetId, $firstRow, $pageName, $dataArray, $cre
     ];
     $update_sheet = $service->spreadsheets_values->update($spreadsheetId, $update_range, $body, $params);
     return $update_sheet;
+}
+
+/**
+ * Clears all horizontal borders in the sheet and draws only a single horizontal border
+ * @param string $spreadsheetId The long string after https://docs.google.com/spreadsheets/d/
+ * @param int $firstRow
+ * @param int $ruleRow At which row to draw the horizontal rule
+ * @param string|object|null $credentials Credentials file path, decoded associative json object, or null for ./credentials.json
+ */
+function hRule($spreadsheetId, $firstRow = 1, $ruleRow = 1, $credentials = null)
+{
+    $service = create_service($credentials);
+    $body = new Sheets\BatchUpdateSpreadsheetRequest([
+        'requests' => [
+            new Sheets\Request([
+                "updateBorders"=> [
+                    "range" => [
+                        "startRowIndex" => $firstRow,
+                        "endRowIndex" => $ruleRow,
+                    ],
+                    "bottom" => [
+                        "style" => "DASHED",
+                        "width" => 4,
+                        "color" => [
+                            "red" => 1.0
+                        ],
+                    ]
+                ],
+            ]),
+            new Sheets\Request([
+                "updateBorders"=> [
+                    "range" => [
+                        "startRowIndex" => $ruleRow,
+                    ],
+                    "innerHorizontal" => [
+                        "style" => "NONE",
+                    ]
+                ],
+            ])
+        ]
+    ]);
+
+    return $service->spreadsheets->batchUpdate($spreadsheetId, $body);
 }
